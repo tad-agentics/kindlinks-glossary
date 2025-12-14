@@ -99,7 +99,11 @@
                 </th>
                 <td>
                     <input type="text" name="hover_bg_color" id="hover_bg_color" class="color-picker" 
-                           value="<?php echo esc_attr(get_option('kindlinks_glossary_hover_bg_color', '#fff3cd')); ?>">
+                           value="<?php echo esc_attr(get_option('kindlinks_glossary_hover_bg_color', '#fff3cd')); ?>"
+                           placeholder="#fff3cd">
+                    <p class="description">
+                        <?php esc_html_e('Hex color (e.g., #fff3cd), rgba (e.g., rgba(255,243,205,0.5)), or "transparent" for no background', 'kindlinks-glossary'); ?>
+                    </p>
                 </td>
             </tr>
             <tr>

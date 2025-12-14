@@ -26,6 +26,34 @@ class Kindlinks_Glossary_Admin {
     }
 
     /**
+     * Sanitize color value (supports hex, rgb, rgba, transparent)
+     *
+     * @param string $color Color value to sanitize
+     * @return string Sanitized color value
+     */
+    private function sanitize_color_value($color) {
+        $color = trim($color);
+        
+        // Allow transparent
+        if (strtolower($color) === 'transparent') {
+            return 'transparent';
+        }
+        
+        // Allow rgb/rgba
+        if (preg_match('/^rgba?\s*\([^)]+\)$/i', $color)) {
+            return sanitize_text_field($color);
+        }
+        
+        // Allow hex colors
+        if (preg_match('/^#[a-f0-9]{3,8}$/i', $color)) {
+            return sanitize_hex_color($color);
+        }
+        
+        // Default fallback
+        return '#fff3cd';
+    }
+
+    /**
      * Check if database table exists and create if needed.
      * This is a safety fallback in case activation hook didn't run.
      */
@@ -131,7 +159,7 @@ class Kindlinks_Glossary_Admin {
         register_setting('kindlinks_glossary_settings', 'kindlinks_glossary_hover_bg_color', [
             'type' => 'string',
             'default' => '#fff3cd',
-            'sanitize_callback' => 'sanitize_hex_color',
+            'sanitize_callback' => [$this, 'sanitize_color_value'],
         ]);
 
         register_setting('kindlinks_glossary_settings', 'kindlinks_glossary_tooltip_keyword_color', [
