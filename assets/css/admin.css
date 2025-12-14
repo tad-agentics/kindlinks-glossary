@@ -1,0 +1,58 @@
+.kindlinks-glossary-admin {
+    max-width: 1200px;
+}
+
+.kindlinks-glossary-admin .card {
+    max-width: 800px;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.kindlinks-glossary-admin pre {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.kindlinks-glossary-admin .required {
+    color: #d63638;
+}
+
+.kindlinks-glossary-admin .form-table th {
+    width: 200px;
+}
+
+.kindlinks-glossary-admin .wp-list-table .delete {
+    color: #d63638;
+}
+
+.kindlinks-glossary-admin .wp-list-table .delete:hover {
+    color: #a00;
+}
+
+/* Loading indicator */
+.kindlinks-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: kindlinks-spin 1s linear infinite;
+}
+
+@keyframes kindlinks-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* RTL Support */
+body.rtl .kindlinks-glossary-admin {
+    direction: rtl;
+}
+
+body.rtl .kindlinks-glossary-admin .form-table th {
+    text-align: right;
+}
+

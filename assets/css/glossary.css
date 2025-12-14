@@ -1,0 +1,188 @@
+/**
+ * Kindlinks Auto Glossary - Styles
+ * 
+ * Kindle-style tooltip styles for glossary terms
+ */
+
+/* Glossary Term Styling */
+.kindlinks-term {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: #F26C26;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.kindlinks-term:hover {
+    background-color: #fff3cd;
+}
+
+/* Tippy Tooltip Custom Styles */
+.tippy-box[data-theme~='light'] {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tippy-box[data-theme~='light'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: #ffffff;
+}
+
+.tippy-box[data-theme~='light'][data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: #ffffff;
+}
+
+.tippy-box[data-theme~='light'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #ffffff;
+}
+
+.tippy-box[data-theme~='light'][data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: #ffffff;
+}
+
+/* Tooltip Content Styling */
+.kindlinks-tooltip-content {
+    padding: 4px;
+}
+
+.kindlinks-tooltip-keyword {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #8B3A3A;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 6px;
+}
+
+.kindlinks-tooltip-definition {
+    margin: 0 0 10px 0;
+    color: #333333;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.kindlinks-tooltip-link {
+    display: inline-block;
+    color: #8B3A3A;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.kindlinks-tooltip-link:hover {
+    color: #6B2A2A;
+    text-decoration: underline;
+}
+
+/* Arrow Styling */
+.tippy-arrow {
+    color: #ffffff;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .tippy-box[data-theme~='light'] {
+        max-width: 280px !important;
+        font-size: 13px;
+    }
+    
+    .kindlinks-tooltip-keyword {
+        font-size: 14px;
+    }
+    
+    .kindlinks-tooltip-definition {
+        font-size: 12px;
+    }
+}
+
+/* Accessibility: Focus States */
+.kindlinks-term:focus {
+    outline: 2px solid #8B3A3A;
+    outline-offset: 2px;
+    background-color: #fff3cd;
+}
+
+/* Animation */
+.tippy-box[data-animation='fade'][data-state='hidden'] {
+    opacity: 0;
+}
+
+/* Shortcode Glossary List Styles */
+.kindlinks-glossary-list {
+    display: grid;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.kindlinks-glossary-list.glossary-column-1 {
+    grid-template-columns: 1fr;
+}
+
+.kindlinks-glossary-list.glossary-column-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.kindlinks-glossary-list.glossary-column-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.kindlinks-glossary-list.glossary-column-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.glossary-term-item {
+    padding: 12px;
+    background: #f9f9f9;
+    border-left: 3px solid #F26C26;
+    border-radius: 4px;
+}
+
+.glossary-term-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #8B3A3A;
+}
+
+@media screen and (max-width: 768px) {
+    .kindlinks-glossary-list.glossary-column-2,
+    .kindlinks-glossary-list.glossary-column-3,
+    .kindlinks-glossary-list.glossary-column-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Loading indicator */
+.kindlinks-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+.kindlinks-loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #F26C26;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation:.kindlinks-spin 1s linear infinite;
+}
+
+@keyframes.kindlinks-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
