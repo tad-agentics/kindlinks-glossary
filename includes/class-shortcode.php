@@ -132,11 +132,12 @@ class Kindlinks_Glossary_Shortcode {
         $output = '<div class="kindlinks-glossary-list ' . esc_attr($column_class) . '">';
         
         foreach ($terms as $term) {
+            $read_more_text = get_option('kindlinks_glossary_read_more_text', 'Xem thêm');
             $output .= sprintf(
                 '<div class="glossary-term-item"><strong>%s</strong>: %s %s</div>',
                 esc_html($term->keyword),
                 wp_kses_post($term->definition),
-                !empty($term->url) ? sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', esc_url($term->url), esc_html__('Read more', 'kindlinks-glossary')) : ''
+                !empty($term->url) ? sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', esc_url($term->url), esc_html($read_more_text)) : ''
             );
         }
         
@@ -152,6 +153,7 @@ class Kindlinks_Glossary_Shortcode {
      * @return string HTML content.
      */
     private function create_tooltip_content($term): string {
+        $read_more_text = get_option('kindlinks_glossary_read_more_text', 'Xem thêm');
         $content = '<div class="kindlinks-tooltip-content">';
         $content .= '<strong class="kindlinks-tooltip-keyword">' . esc_html($term->keyword) . '</strong>';
         $content .= '<p class="kindlinks-tooltip-definition">' . wp_kses_post($term->definition) . '</p>';
@@ -160,7 +162,7 @@ class Kindlinks_Glossary_Shortcode {
             $content .= sprintf(
                 '<a href="%s" class="kindlinks-tooltip-link" target="_blank" rel="noopener noreferrer">%s →</a>',
                 esc_url($term->url),
-                esc_html__('Read more', 'kindlinks-glossary')
+                esc_html($read_more_text)
             );
         }
         

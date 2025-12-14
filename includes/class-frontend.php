@@ -19,29 +19,44 @@ class Kindlinks_Glossary_Frontend {
      * Only loads on single posts and pages.
      */
     public function enqueue_assets(): void {
+        // Debug info
+        $debug_info = [];
+        
         // Get enabled post types
         $enabled_post_types = explode(',', get_option('kindlinks_glossary_enabled_post_types', 'post,page'));
         $enabled_post_types = array_map('trim', $enabled_post_types);
         
         // Check if current post type is enabled
         $current_post_type = get_post_type();
+        $debug_info['current_post_type'] = $current_post_type;
+        $debug_info['enabled_post_types'] = $enabled_post_types;
+        $debug_info['post_type_check'] = in_array($current_post_type, $enabled_post_types);
+        
         if (!in_array($current_post_type, $enabled_post_types)) {
+            $this->output_debug_info($debug_info, 'Post type not enabled');
             return;
         }
 
         // Check if glossary is disabled for this specific post
-        if (is_singular() && get_post_meta(get_the_ID(), '_kindlinks_glossary_disabled', true) === '1') {
+        $is_disabled = is_singular() && get_post_meta(get_the_ID(), '_kindlinks_glossary_disabled', true) === '1';
+        $debug_info['post_disabled'] = $is_disabled;
+        
+        if ($is_disabled) {
+            $this->output_debug_info($debug_info, 'Glossary disabled for this post');
             return;
         }
 
         // Check if post category is enabled (for posts only)
         if (is_singular('post')) {
             $enabled_categories = get_option('kindlinks_glossary_enabled_categories', ['all']);
+            $post_categories = wp_get_post_categories(get_the_ID());
+            
+            $debug_info['enabled_categories'] = $enabled_categories;
+            $debug_info['post_categories'] = $post_categories;
+            $debug_info['is_all_categories'] = in_array('all', $enabled_categories);
             
             // If not set to 'all', check if post's categories match
             if (!in_array('all', $enabled_categories)) {
-                $post_categories = wp_get_post_categories(get_the_ID());
-                
                 // Check if any of the post's categories are in the enabled list
                 $has_enabled_category = false;
                 foreach ($post_categories as $cat_id) {
@@ -51,8 +66,11 @@ class Kindlinks_Glossary_Frontend {
                     }
                 }
                 
+                $debug_info['has_enabled_category'] = $has_enabled_category;
+                
                 // If post doesn't have any enabled categories, don't load glossary
                 if (!$has_enabled_category) {
+                    $this->output_debug_info($debug_info, 'Post category not in enabled list');
                     return;
                 }
             }
@@ -64,10 +82,15 @@ class Kindlinks_Glossary_Frontend {
         // Apply filter for extensibility
         $glossary_data = apply_filters('kindlinks_glossary_terms', $glossary_data);
 
+        $debug_info['terms_count'] = count($glossary_data);
+        
         // Only enqueue if we have terms (lazy loading)
         if (empty($glossary_data)) {
+            $this->output_debug_info($debug_info, 'No glossary terms found');
             return;
         }
+        
+        $debug_info['status'] = 'Loading glossary';
 
         // Enqueue Popper.js (required by Tippy.js) - Local bundle for reliability and performance
         wp_enqueue_script(
@@ -110,6 +133,7 @@ class Kindlinks_Glossary_Frontend {
         $underline_color = get_option('kindlinks_glossary_underline_color', '#F26C26');
         $hover_bg_color = get_option('kindlinks_glossary_hover_bg_color', '#fff3cd');
         $tooltip_keyword_color = get_option('kindlinks_glossary_tooltip_keyword_color', '#8B3A3A');
+        $read_more_text = get_option('kindlinks_glossary_read_more_text', 'Xem thêm');
 
         // Apply filters for extensibility
         $max_limit = apply_filters('kindlinks_glossary_max_limit', $max_limit);
@@ -123,6 +147,7 @@ class Kindlinks_Glossary_Frontend {
                 'terms' => $glossary_data,
                 'max_limit' => $max_limit,
                 'content_selectors' => $content_selectors,
+                'read_more_text' => $read_more_text,
                 'colors' => [
                     'underline' => $underline_color,
                     'hover_bg' => $hover_bg_color,
@@ -149,6 +174,9 @@ class Kindlinks_Glossary_Frontend {
             }
         ";
         wp_add_inline_style('kindlinks-glossary-css', $custom_css);
+        
+        // Output debug info if WP_DEBUG is enabled
+        $this->output_debug_info($debug_info, 'Glossary loaded successfully');
     }
 
     /**
@@ -198,6 +226,27 @@ class Kindlinks_Glossary_Frontend {
         set_transient('kindlinks_glossary_terms', $formatted_data, 10 * MINUTE_IN_SECONDS);
 
         return $formatted_data;
+    }
+
+    /**
+     * Output debug information (only when WP_DEBUG is enabled)
+     *
+     * @param array $debug_info Debug information
+     * @param string $reason Reason for not loading
+     */
+    private function output_debug_info(array $debug_info, string $reason = ''): void {
+        if (!defined('WP_DEBUG') || !WP_DEBUG) {
+            return;
+        }
+
+        $debug_info['reason'] = $reason;
+        
+        // Output as HTML comment and console log
+        add_action('wp_footer', function() use ($debug_info) {
+            echo "\n<!-- Kindlinks Glossary Debug -->\n";
+            echo "<!-- " . esc_html(json_encode($debug_info, JSON_PRETTY_PRINT)) . " -->\n";
+            echo "<script>console.log('Kindlinks Glossary Debug:', " . wp_json_encode($debug_info) . ");</script>\n";
+        }, 999);
     }
 }
 

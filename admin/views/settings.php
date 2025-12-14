@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap kindlinks-glossary-admin">
     <h1><?php esc_html_e('Glossary Settings', 'kindlinks-glossary'); ?></h1>
 
     <form method="post" action="">
@@ -109,6 +109,19 @@
                 <td>
                     <input type="text" name="tooltip_keyword_color" id="tooltip_keyword_color" class="color-picker" 
                            value="<?php echo esc_attr(get_option('kindlinks_glossary_tooltip_keyword_color', '#8B3A3A')); ?>">
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="read_more_text"><?php esc_html_e('"Read More" Link Text', 'kindlinks-glossary'); ?></label>
+                </th>
+                <td>
+                    <input type="text" name="read_more_text" id="read_more_text" class="regular-text" 
+                           value="<?php echo esc_attr(get_option('kindlinks_glossary_read_more_text', 'Xem thêm')); ?>"
+                           placeholder="Xem thêm">
+                    <p class="description">
+                        <?php esc_html_e('Text displayed for the "Read More" link in tooltips. Examples: "Xem thêm", "Đọc thêm", "Chi tiết"', 'kindlinks-glossary'); ?>
+                    </p>
                 </td>
             </tr>
         </table>

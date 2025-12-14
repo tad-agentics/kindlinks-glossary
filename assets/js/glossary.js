@@ -17,6 +17,7 @@
         terms: KindlinksData.terms,
         maxLimit: KindlinksData.max_limit || 2,
         targetSelectors: KindlinksData.content_selectors ? KindlinksData.content_selectors.split(',').map(s => s.trim()) : ['.entry-content', '.breakdance-post-content'],
+        readMoreText: KindlinksData.read_more_text || 'Xem thêm',
         excludeTags: ['A', 'SCRIPT', 'STYLE', 'TEXTAREA', 'CODE', 'PRE', 'BUTTON', 'INPUT'],
         trackClicks: KindlinksData.track_clicks !== undefined ? KindlinksData.track_clicks : true,
         ajaxUrl: KindlinksData.ajax_url || ''
@@ -229,7 +230,7 @@
         content += `<p class="kindlinks-tooltip-definition">${term.definition}</p>`;
         
         if (term.url && term.url.trim() !== '') {
-            content += `<a href="${escapeHtml(term.url)}" class="kindlinks-tooltip-link" target="_blank" rel="noopener noreferrer">Read more →</a>`;
+            content += `<a href="${escapeHtml(term.url)}" class="kindlinks-tooltip-link" target="_blank" rel="noopener noreferrer">${escapeHtml(config.readMoreText)} →</a>`;
         }
         
         content += `</div>`;

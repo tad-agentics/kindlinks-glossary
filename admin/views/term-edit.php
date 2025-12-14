@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap kindlinks-glossary-admin">
     <h1><?php echo $is_edit ? esc_html__('Edit Term', 'kindlinks-glossary') : esc_html__('Add New Term', 'kindlinks-glossary'); ?></h1>
 
     <form method="post" action="">

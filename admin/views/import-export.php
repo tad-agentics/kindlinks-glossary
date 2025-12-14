@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap kindlinks-glossary-admin">
     <h1><?php esc_html_e('Import/Export Glossary Terms', 'kindlinks-glossary'); ?></h1>
 
     <div class="card">

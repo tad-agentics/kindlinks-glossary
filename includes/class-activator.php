@@ -46,8 +46,7 @@ class Kindlinks_Glossary_Activator {
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
             PRIMARY KEY  (id),
             UNIQUE KEY keyword (keyword),
-            KEY category (category),
-            KEY keyword_length ((LENGTH(keyword)))
+            KEY category (category)
         ) {$charset_collate};";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -63,6 +62,7 @@ class Kindlinks_Glossary_Activator {
             'kindlinks_glossary_tooltip_keyword_color' => '#8B3A3A',
             'kindlinks_glossary_enabled_post_types' => 'post,page',
             'kindlinks_glossary_enabled_categories' => ['all'],
+            'kindlinks_glossary_read_more_text' => 'Xem thêm',
             'kindlinks_glossary_api_key' => wp_generate_password(32, false),
         ];
 

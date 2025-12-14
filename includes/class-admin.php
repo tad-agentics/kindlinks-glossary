@@ -19,9 +19,40 @@ class Kindlinks_Glossary_Admin {
     public function __construct() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_init', [$this, 'check_database_table']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         add_action('add_meta_boxes', [$this, 'add_meta_boxes']);
         add_action('save_post', [$this, 'save_meta_box']);
+    }
+
+    /**
+     * Check if database table exists and create if needed.
+     * This is a safety fallback in case activation hook didn't run.
+     */
+    public function check_database_table(): void {
+        // Only check on glossary admin pages
+        if (!isset($_GET['page']) || strpos($_GET['page'], 'kindlinks-glossary') === false) {
+            return;
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kindlinks_glossary';
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name;
+        
+        if (!$table_exists) {
+            // Table doesn't exist, create it now
+            require_once KINDLINKS_GLOSSARY_PLUGIN_DIR . 'includes/class-activator.php';
+            Kindlinks_Glossary_Activator::activate();
+            
+            // Show admin notice
+            add_action('admin_notices', function() {
+                echo '<div class="notice notice-success is-dismissible">';
+                echo '<p>' . esc_html__('Database table created successfully!', 'kindlinks-glossary') . '</p>';
+                echo '</div>';
+            });
+        }
     }
 
     /**
@@ -112,6 +143,12 @@ class Kindlinks_Glossary_Admin {
         register_setting('kindlinks_glossary_settings', 'kindlinks_glossary_enabled_post_types', [
             'type' => 'string',
             'default' => 'post,page',
+            'sanitize_callback' => 'sanitize_text_field',
+        ]);
+
+        register_setting('kindlinks_glossary_settings', 'kindlinks_glossary_read_more_text', [
+            'type' => 'string',
+            'default' => 'Xem thêm',
             'sanitize_callback' => 'sanitize_text_field',
         ]);
 
@@ -233,8 +270,30 @@ class Kindlinks_Glossary_Admin {
             }
         }
 
-        // Get all terms
-        $terms = $wpdb->get_results("SELECT * FROM {$table_name} ORDER BY keyword ASC");
+        // Check if table exists
+        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) === $table_name;
+        
+        if (!$table_exists) {
+            echo '<div class="notice notice-error"><p>' . esc_html__('Database table not found. Please deactivate and reactivate the plugin.', 'kindlinks-glossary') . '</p></div>';
+            $terms = [];
+        } else {
+            // Get all terms
+            $terms = $wpdb->get_results("SELECT * FROM {$table_name} ORDER BY keyword ASC");
+            
+            // Check for database errors
+            if ($wpdb->last_error) {
+                echo '<div class="notice notice-error"><p>' . esc_html__('Database error: ', 'kindlinks-glossary') . esc_html($wpdb->last_error) . '</p></div>';
+            }
+            
+            // Debug info (comment out in production)
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                echo '<div class="notice notice-info"><p>';
+                echo 'Table: ' . esc_html($table_name) . '<br>';
+                echo 'Terms found: ' . count($terms) . '<br>';
+                echo 'Last query: ' . esc_html($wpdb->last_query);
+                echo '</p></div>';
+            }
+        }
 
         include KINDLINKS_GLOSSARY_PLUGIN_DIR . 'admin/views/terms-list.php';
     }
@@ -263,25 +322,45 @@ class Kindlinks_Glossary_Admin {
             $category = sanitize_text_field($_POST['category']);
 
             if ($is_edit && $term) {
-                $wpdb->update(
+                $result = $wpdb->update(
                     $table_name,
                     ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category],
                     ['id' => $term->id],
                     ['%s', '%s', '%s', '%s'],
                     ['%d']
                 );
-                $message = __('Term updated successfully.', 'kindlinks-glossary');
+                
+                if ($result !== false) {
+                    $message = __('Term updated successfully.', 'kindlinks-glossary');
+                    echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
+                } else {
+                    echo '<div class="notice notice-error"><p>' . esc_html__('Failed to update term: ', 'kindlinks-glossary') . esc_html($wpdb->last_error) . '</p></div>';
+                }
             } else {
-                $wpdb->insert(
+                $result = $wpdb->insert(
                     $table_name,
                     ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category],
                     ['%s', '%s', '%s', '%s']
                 );
-                $message = __('Term added successfully.', 'kindlinks-glossary');
+                
+                if ($result) {
+                    $message = __('Term added successfully.', 'kindlinks-glossary');
+                    echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
+                    
+                    // Debug info
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        echo '<div class="notice notice-info"><p>';
+                        echo 'Inserted ID: ' . $wpdb->insert_id . '<br>';
+                        echo 'Table: ' . esc_html($table_name) . '<br>';
+                        echo 'Keyword: ' . esc_html($keyword);
+                        echo '</p></div>';
+                    }
+                } else {
+                    echo '<div class="notice notice-error"><p>' . esc_html__('Failed to add term: ', 'kindlinks-glossary') . esc_html($wpdb->last_error) . '</p></div>';
+                }
             }
 
             delete_transient('kindlinks_glossary_terms');
-            echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
             
             if (!$is_edit) {
                 $term = null; // Reset form
@@ -302,6 +381,7 @@ class Kindlinks_Glossary_Admin {
             update_option('kindlinks_glossary_hover_bg_color', sanitize_hex_color($_POST['hover_bg_color']));
             update_option('kindlinks_glossary_tooltip_keyword_color', sanitize_hex_color($_POST['tooltip_keyword_color']));
             update_option('kindlinks_glossary_enabled_post_types', sanitize_text_field($_POST['enabled_post_types']));
+            update_option('kindlinks_glossary_read_more_text', sanitize_text_field($_POST['read_more_text']));
             
             // Handle category filtering
             $enabled_categories = [];
