@@ -270,7 +270,7 @@
                 animation: 'fade',
                 duration: [200, 150],
                 arrow: true,
-                touch: ['hold', 500],
+                touch: true, // Enable tap on mobile (no hold required)
                 // Accessibility improvements
                 aria: {
                     content: 'describedby',
