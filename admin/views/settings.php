@@ -98,9 +98,9 @@
                     <label for="hover_bg_color"><?php esc_html_e('Hover Background Color', 'kindlinks-glossary'); ?></label>
                 </th>
                 <td>
-                    <input type="text" name="hover_bg_color" id="hover_bg_color" class="color-picker" 
+                    <input type="text" name="hover_bg_color" id="hover_bg_color" class="regular-text" 
                            value="<?php echo esc_attr(get_option('kindlinks_glossary_hover_bg_color', '#fff3cd')); ?>"
-                           placeholder="#fff3cd">
+                           placeholder="transparent">
                     <p class="description">
                         <?php esc_html_e('Hex color (e.g., #fff3cd), rgba (e.g., rgba(255,243,205,0.5)), or "transparent" for no background', 'kindlinks-glossary'); ?>
                     </p>
