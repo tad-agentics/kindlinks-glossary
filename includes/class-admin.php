@@ -457,10 +457,24 @@ class Kindlinks_Glossary_Admin {
                 $json = file_get_contents($_FILES['import_file']['tmp_name']);
                 $terms = json_decode($json, true);
 
-                if (is_array($terms)) {
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    echo '<div class="notice notice-error"><p>' . esc_html__('Invalid JSON file: ', 'kindlinks-glossary') . esc_html(json_last_error_msg()) . '</p></div>';
+                } elseif (!is_array($terms)) {
+                    echo '<div class="notice notice-error"><p>' . esc_html__('Invalid format: JSON must be an array of terms', 'kindlinks-glossary') . '</p></div>';
+                } elseif (empty($terms)) {
+                    echo '<div class="notice notice-warning"><p>' . esc_html__('No terms found in the file', 'kindlinks-glossary') . '</p></div>';
+                } else {
                     $imported = 0;
-                    foreach ($terms as $term) {
-                        $wpdb->replace(
+                    $errors = [];
+                    
+                    foreach ($terms as $index => $term) {
+                        // Validate required fields
+                        if (empty($term['keyword']) || empty($term['definition'])) {
+                            $errors[] = sprintf(__('Term #%d: Missing keyword or definition', 'kindlinks-glossary'), $index + 1);
+                            continue;
+                        }
+                        
+                        $result = $wpdb->replace(
                             $table_name,
                             [
                                 'keyword' => sanitize_text_field($term['keyword']),
@@ -470,11 +484,43 @@ class Kindlinks_Glossary_Admin {
                             ],
                             ['%s', '%s', '%s', '%s']
                         );
-                        $imported++;
+                        
+                        if ($result) {
+                            $imported++;
+                        } else {
+                            $errors[] = sprintf(__('Term #%d (%s): Database error', 'kindlinks-glossary'), $index + 1, $term['keyword']);
+                        }
                     }
+                    
                     delete_transient('kindlinks_glossary_terms');
-                    echo '<div class="notice notice-success"><p>' . sprintf(esc_html__('Imported %d terms successfully.', 'kindlinks-glossary'), $imported) . '</p></div>';
+                    
+                    if ($imported > 0) {
+                        echo '<div class="notice notice-success"><p>' . sprintf(esc_html__('Imported %d terms successfully.', 'kindlinks-glossary'), $imported) . '</p></div>';
+                    }
+                    
+                    if (!empty($errors)) {
+                        echo '<div class="notice notice-warning"><p><strong>' . esc_html__('Some terms could not be imported:', 'kindlinks-glossary') . '</strong><br>';
+                        foreach ($errors as $error) {
+                            echo esc_html($error) . '<br>';
+                        }
+                        echo '</p></div>';
+                    }
                 }
+            } else {
+                $error_messages = [
+                    UPLOAD_ERR_INI_SIZE => __('File is too large (exceeds upload_max_filesize)', 'kindlinks-glossary'),
+                    UPLOAD_ERR_FORM_SIZE => __('File is too large', 'kindlinks-glossary'),
+                    UPLOAD_ERR_PARTIAL => __('File was only partially uploaded', 'kindlinks-glossary'),
+                    UPLOAD_ERR_NO_FILE => __('No file was uploaded', 'kindlinks-glossary'),
+                    UPLOAD_ERR_NO_TMP_DIR => __('Missing temporary folder', 'kindlinks-glossary'),
+                    UPLOAD_ERR_CANT_WRITE => __('Failed to write file to disk', 'kindlinks-glossary'),
+                    UPLOAD_ERR_EXTENSION => __('File upload stopped by extension', 'kindlinks-glossary'),
+                ];
+                
+                $error_code = $_FILES['import_file']['error'] ?? UPLOAD_ERR_NO_FILE;
+                $error_message = $error_messages[$error_code] ?? __('Unknown upload error', 'kindlinks-glossary');
+                
+                echo '<div class="notice notice-error"><p>' . esc_html__('Upload failed: ', 'kindlinks-glossary') . esc_html($error_message) . '</p></div>';
             }
         }
 
