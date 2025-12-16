@@ -56,6 +56,7 @@ class Kindlinks_Glossary_Admin {
     /**
      * Check if database table exists and create if needed.
      * This is a safety fallback in case activation hook didn't run.
+     * Also handles database migrations for new columns.
      */
     public function check_database_table(): void {
         // Only check on glossary admin pages
@@ -80,6 +81,24 @@ class Kindlinks_Glossary_Admin {
                 echo '<p>' . esc_html__('Database table created successfully!', 'kindlinks-glossary') . '</p>';
                 echo '</div>';
             });
+        } else {
+            // Table exists, check if 'aliases' column exists (for migration from older versions)
+            $columns = $wpdb->get_col("DESCRIBE {$table_name}");
+            
+            if (!in_array('aliases', $columns)) {
+                // Add the aliases column
+                $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN aliases text DEFAULT '' NOT NULL AFTER category");
+                
+                // Show admin notice
+                add_action('admin_notices', function() {
+                    echo '<div class="notice notice-success is-dismissible">';
+                    echo '<p>' . esc_html__('Database updated: Aliases column added successfully!', 'kindlinks-glossary') . '</p>';
+                    echo '</div>';
+                });
+                
+                // Clear cache
+                delete_transient('kindlinks_glossary_terms');
+            }
         }
     }
 
