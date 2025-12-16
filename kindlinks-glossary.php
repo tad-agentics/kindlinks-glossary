@@ -3,7 +3,7 @@
  * Plugin Name: Kindlinks Auto Glossary
  * Plugin URI: https://kindlinks.com
  * Description: Automatically highlights keywords in blog posts with Kindle-style tooltips. Optimized for long-form content (50k+ words).
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: Kindlinks
  * Author URI: https://kindlinks.com
  * License: GPL-2.0+
@@ -24,7 +24,7 @@ if (!defined('WPINC')) {
 /**
  * Current plugin version.
  */
-define('KINDLINKS_GLOSSARY_VERSION', '2.1.0');
+define('KINDLINKS_GLOSSARY_VERSION', '2.2.0');
 define('KINDLINKS_GLOSSARY_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KINDLINKS_GLOSSARY_PLUGIN_URL', plugin_dir_url(__FILE__));
 
