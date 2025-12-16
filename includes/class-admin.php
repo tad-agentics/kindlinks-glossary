@@ -348,13 +348,14 @@ class Kindlinks_Glossary_Admin {
             $definition = wp_kses_post($_POST['definition']);
             $url = esc_url_raw($_POST['url']);
             $category = sanitize_text_field($_POST['category']);
+            $aliases = sanitize_text_field($_POST['aliases'] ?? '');
 
             if ($is_edit && $term) {
                 $result = $wpdb->update(
                     $table_name,
-                    ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category],
+                    ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category, 'aliases' => $aliases],
                     ['id' => $term->id],
-                    ['%s', '%s', '%s', '%s'],
+                    ['%s', '%s', '%s', '%s', '%s'],
                     ['%d']
                 );
                 
@@ -367,8 +368,8 @@ class Kindlinks_Glossary_Admin {
             } else {
                 $result = $wpdb->insert(
                     $table_name,
-                    ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category],
-                    ['%s', '%s', '%s', '%s']
+                    ['keyword' => $keyword, 'definition' => $definition, 'url' => $url, 'category' => $category, 'aliases' => $aliases],
+                    ['%s', '%s', '%s', '%s', '%s']
                 );
                 
                 if ($result) {
@@ -443,7 +444,7 @@ class Kindlinks_Glossary_Admin {
 
         // Handle export
         if (isset($_POST['kindlinks_glossary_export']) && check_admin_referer('kindlinks_glossary_import_export')) {
-            $terms = $wpdb->get_results("SELECT keyword, definition, url, category FROM {$table_name}", ARRAY_A);
+            $terms = $wpdb->get_results("SELECT keyword, definition, url, category, aliases FROM {$table_name}", ARRAY_A);
             
             header('Content-Type: application/json');
             header('Content-Disposition: attachment; filename="glossary-terms-' . date('Y-m-d') . '.json"');
@@ -481,8 +482,9 @@ class Kindlinks_Glossary_Admin {
                                 'definition' => wp_kses_post($term['definition']),
                                 'url' => esc_url_raw($term['url'] ?? ''),
                                 'category' => sanitize_text_field($term['category'] ?? 'general'),
+                                'aliases' => sanitize_text_field($term['aliases'] ?? ''),
                             ],
-                            ['%s', '%s', '%s', '%s']
+                            ['%s', '%s', '%s', '%s', '%s']
                         );
                         
                         if ($result) {

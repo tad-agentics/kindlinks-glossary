@@ -156,13 +156,21 @@
                 continue;
             }
 
-            // Create regex for whole word matching (case insensitive)
-            const regex = new RegExp(`\\b(${escapeRegex(term.keyword)})\\b`, 'gi');
+            // Build list of keywords to match: main keyword + aliases
+            const keywordsToMatch = [term.keyword];
+            if (term.aliases && term.aliases.trim() !== '') {
+                const aliases = term.aliases.split(',').map(a => a.trim()).filter(a => a !== '');
+                keywordsToMatch.push(...aliases);
+            }
+
+            // Create regex for whole word matching (case insensitive) for all keywords
+            const regexPattern = keywordsToMatch.map(kw => escapeRegex(kw)).join('|');
+            const regex = new RegExp(`\\b(${regexPattern})\\b`, 'gi');
             
             let match;
             let matchesForThisTerm = 0;
 
-            // Find all matches for this term
+            // Find all matches for this term (including aliases)
             while ((match = regex.exec(originalText)) !== null) {
                 const remainingSlots = config.maxLimit - keywordCount[keywordLower] - matchesForThisTerm;
                 

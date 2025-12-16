@@ -41,6 +41,7 @@ class Kindlinks_Glossary_Activator {
             definition text NOT NULL,
             url varchar(255) DEFAULT '' NOT NULL,
             category varchar(100) DEFAULT 'general' NOT NULL,
+            aliases text DEFAULT '' NOT NULL,
             click_count int DEFAULT 0 NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,

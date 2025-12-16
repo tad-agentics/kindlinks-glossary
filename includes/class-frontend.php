@@ -203,7 +203,7 @@ class Kindlinks_Glossary_Frontend {
 
         // Fetch all terms, ordered by keyword length (longest first)
         $results = $wpdb->get_results(
-            "SELECT keyword, definition, url 
+            "SELECT keyword, definition, url, aliases 
             FROM {$table_name} 
             ORDER BY LENGTH(keyword) DESC",
             ARRAY_A
@@ -219,6 +219,7 @@ class Kindlinks_Glossary_Frontend {
                 'keyword'    => $term['keyword'],
                 'definition' => $term['definition'],
                 'url'        => $term['url'],
+                'aliases'    => $term['aliases'] ?? '',
             ];
         }, $results);
 

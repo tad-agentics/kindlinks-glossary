@@ -55,6 +55,19 @@
                     <p class="description"><?php esc_html_e('Category for organizing terms (e.g., "technical", "business").', 'kindlinks-glossary'); ?></p>
                 </td>
             </tr>
+            <tr>
+                <th scope="row">
+                    <label for="aliases"><?php esc_html_e('Aliases', 'kindlinks-glossary'); ?></label>
+                </th>
+                <td>
+                    <input type="text" name="aliases" id="aliases" class="regular-text" 
+                           value="<?php echo $term ? esc_attr($term->aliases ?? '') : ''; ?>" 
+                           placeholder="<?php esc_attr_e('e.g., Tử Vi, Tử Vĩ, Tu Vi', 'kindlinks-glossary'); ?>">
+                    <p class="description">
+                        <?php esc_html_e('Alternative keywords to match (comma-separated). Example: If the main keyword is "Sao Tử Vi", add aliases like "Tử Vi, Tử Vĩ" so the plugin will also highlight these shorter variations.', 'kindlinks-glossary'); ?>
+                    </p>
+                </td>
+            </tr>
         </table>
 
         <p class="submit">
