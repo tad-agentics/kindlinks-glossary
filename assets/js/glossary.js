@@ -42,37 +42,57 @@
      * Process the content and highlight keywords
      */
     function processContent() {
-        // Find target content area
-        const contentArea = findContentArea();
-        if (!contentArea) {
-            console.warn('Kindlinks Glossary: Target content area not found');
+        // Find ALL target content areas (not just the first one)
+        const contentAreas = findAllContentAreas();
+        if (contentAreas.length === 0) {
+            console.warn('Kindlinks Glossary: No target content areas found');
             return;
         }
+
+        console.log(`Kindlinks Glossary: Found ${contentAreas.length} content area(s) to scan`);
 
         // Initialize keyword counter
         config.terms.forEach(term => {
             keywordCount[term.keyword.toLowerCase()] = 0;
         });
 
-        // Process text nodes and highlight keywords
-        highlightKeywords(contentArea);
+        // Process text nodes and highlight keywords in ALL content areas
+        contentAreas.forEach((contentArea, index) => {
+            console.log(`Kindlinks Glossary: Scanning area ${index + 1}/${contentAreas.length}:`, contentArea);
+            highlightKeywords(contentArea);
+        });
 
         // Initialize Tippy.js tooltips
         initializeTooltips();
     }
 
     /**
-     * Find the content area to process
-     * @returns {Element|null} The content element or null
+     * Find ALL content areas to process
+     * @returns {Element[]} Array of content elements
      */
-    function findContentArea() {
+    function findAllContentAreas() {
+        const foundAreas = [];
+        const processedElements = new Set();
+
         for (const selector of config.targetSelectors) {
-            const element = document.querySelector(selector);
-            if (element) {
-                return element;
-            }
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                // Avoid processing the same element twice
+                if (!processedElements.has(element)) {
+                    // Avoid nested elements (don't scan a parent if we're already scanning a child)
+                    const isNested = Array.from(processedElements).some(existing => 
+                        existing.contains(element) || element.contains(existing)
+                    );
+                    
+                    if (!isNested) {
+                        foundAreas.push(element);
+                        processedElements.add(element);
+                    }
+                }
+            });
         }
-        return null;
+
+        return foundAreas;
     }
 
     /**

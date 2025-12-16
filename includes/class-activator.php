@@ -56,7 +56,7 @@ class Kindlinks_Glossary_Activator {
         $defaults = [
             'kindlinks_glossary_db_version' => KINDLINKS_GLOSSARY_VERSION,
             'kindlinks_glossary_max_limit' => 2,
-            'kindlinks_glossary_content_selectors' => '.entry-content,.breakdance-post-content',
+            'kindlinks_glossary_content_selectors' => '#post-content-area,.bde-rich-text,.entry-content,article,main,.content,.post-content,.collapsible-content,.lg-box-container,.bde-column,.elementor-widget-container',
             'kindlinks_glossary_underline_color' => '#F26C26',
             'kindlinks_glossary_hover_bg_color' => '#fff3cd',
             'kindlinks_glossary_tooltip_keyword_color' => '#8B3A3A',

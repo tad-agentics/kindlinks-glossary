@@ -22,9 +22,9 @@
                 </th>
                 <td>
                     <input type="text" name="content_selectors" id="content_selectors" class="regular-text" 
-                           value="<?php echo esc_attr(get_option('kindlinks_glossary_content_selectors', '.entry-content,.breakdance-post-content')); ?>">
+                           value="<?php echo esc_attr(get_option('kindlinks_glossary_content_selectors', '#post-content-area,.bde-rich-text,.entry-content,article,main,.content,.post-content,.collapsible-content,.lg-box-container,.bde-column,.elementor-widget-container')); ?>">
                     <p class="description">
-                        <?php esc_html_e('CSS selectors where glossary should run (comma-separated). Common: .entry-content, .elementor-widget-theme-post-content, .et_pb_post_content', 'kindlinks-glossary'); ?>
+                        <?php esc_html_e('CSS selectors where glossary should run (comma-separated). The plugin will scan ALL matching areas on the page to maximize term highlighting. Common selectors: .entry-content, .bde-rich-text, article, main, .elementor-widget-container, .et_pb_post_content', 'kindlinks-glossary'); ?>
                     </p>
                 </td>
             </tr>
